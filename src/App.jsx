@@ -2,15 +2,17 @@ import { useState, useRef, useEffect } from 'react'
 import './App.css'
 
 const QUESTIONS = [
+  "Introduce yourself, your name and your company title",
   "What challenge or need led you to work with We Build Bridges?",
-  "What made you choose us over other options or agencies?",
   "What was the experience like working with us?",
-  "What kind of results did you see from the project or campaign?",
+  "Is there anything that stood out to you about working with us versus other options?",
+  "What kind of work did you get done, and what did you think of the final product?",
   "What would you say to someone considering working with us?"
 ];
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [hasStartedTestimonial, setHasStartedTestimonial] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
   const [recordings, setRecordings] = useState(Array(QUESTIONS.length).fill(null));
@@ -22,6 +24,7 @@ function App() {
   const [uploading, setUploading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const animationFrameId = useRef(null);
@@ -324,7 +327,7 @@ function App() {
         videoRef.current.src = '';
         videoRef.current.srcObject = cameraStream;
         videoRef.current.muted = true;
-        videoRef.current.controls = false;
+        setIsVideoPlaying(false);
       }
     }
   };
@@ -352,7 +355,15 @@ function App() {
       videoRef.current.src = '';
       videoRef.current.srcObject = cameraStream;
       videoRef.current.muted = true;
-      videoRef.current.controls = false;
+      setIsVideoPlaying(false);
+    }
+  };
+
+  const replayVideo = () => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+      videoRef.current.play();
+      setIsVideoPlaying(true);
     }
   };
 
@@ -388,7 +399,7 @@ function App() {
         videoRef.current.srcObject = null;
         videoRef.current.src = recordingUrls[currentQuestion];
         videoRef.current.muted = false;
-        videoRef.current.controls = true;
+        setIsVideoPlaying(false); // Reset to show replay button initially
       } else {
         // When showing the live feed, show the canvas (on mobile) or video (on desktop)
         if (isMobile && canvasRef.current) {
@@ -400,7 +411,7 @@ function App() {
         videoRef.current.src = '';
         videoRef.current.srcObject = cameraStream;
         videoRef.current.muted = true;
-        videoRef.current.controls = false;
+        setIsVideoPlaying(false);
       }
     }
   }, [currentQuestion, recordings, cameraStream, recordingUrls, isMobile]);
@@ -439,7 +450,7 @@ function App() {
         <div className="content-card">
           <img src="/Red Logo.svg" alt="Logo" className="auth-logo" />
           <h2>Video Testimonials</h2>
-          <p className="question-text">Please enter the password to access the testimonial recording.</p>
+          <p className="description-text">Please enter the password to access the testimonial recording.</p>
           <form onSubmit={handlePasswordSubmit}>
             <input
               type="password"
@@ -457,6 +468,57 @@ function App() {
     );
   }
 
+  // Splash screen with instructions
+  if (isAuthenticated && !hasStartedTestimonial) {
+    return (
+      <div className="container">
+        <div className="content-card">
+          <img src="/Red Logo.svg" alt="Logo" className="auth-logo" />
+          <h2>Ready to Record Your Testimonial?</h2>
+          <p className="description-text">Before we begin, please follow these quick tips for the best recording experience:</p>
+          
+          <div className="instructions-list">
+            <div className="instruction-item">
+              <div className="instruction-icon">
+                <i className="fas fa-lightbulb"></i>
+              </div>
+              <div className="instruction-text">Find good lighting</div>
+            </div>
+            
+            <div className="instruction-item">
+              <div className="instruction-icon">
+                <i className="fas fa-headphones-alt"></i>
+              </div>
+              <div className="instruction-text">No AirPods / iPhone audio is better</div>
+            </div>
+            
+            <div className="instruction-item">
+              <div className="instruction-icon">
+                <i className="fas fa-comments"></i>
+              </div>
+              <div className="instruction-text">Speak in your own voice. Whatever feels natural is probably best</div>
+            </div>
+            
+            <div className="instruction-item">
+              <div className="instruction-icon">
+                <i className="fas fa-clock"></i>
+              </div>
+              <div className="instruction-text">Take your time - you can retake any question if needed</div>
+            </div>
+          </div>
+
+          <button 
+            onClick={() => setHasStartedTestimonial(true)}
+            className="btn-primary begin-testimonial-btn"
+          >
+            <i className="fas fa-video"></i>
+            Begin Testimonial
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (isSubmitted) {
     return (
       <div className="container">
@@ -466,8 +528,8 @@ function App() {
               <i className="fas fa-check-circle"></i>
             </div>
             <h2>Thank You!</h2>
-            <p className="question-text">Your video testimonials have been successfully submitted and uploaded to Mux.</p>
-            <p className="question-text">We appreciate you taking the time to share your experiences with us.</p>
+            <p className="question-text">Your video testimonials have been successfully submitted.</p>
+            <p className="question-text">Thanks for taking the time to do this! It really means a lot! - Chris</p>
           </div>
         </div>
       </div>
@@ -486,10 +548,23 @@ function App() {
             ref={videoRef} 
             autoPlay 
             playsInline
+            controls={currentRecording && isVideoPlaying}
             onLoadedData={processVideoForMobile}
+            onPlay={() => setIsVideoPlaying(true)}
+            onPause={() => setIsVideoPlaying(false)}
+            onEnded={() => setIsVideoPlaying(false)}
             style={{ display: isMobile ? 'none' : 'block' }}
           />
           {isMobile && <canvas ref={canvasRef} />}
+
+          {/* Replay button overlay for recorded videos */}
+          {currentRecording && !isVideoPlaying && (
+            <div className="replay-overlay">
+              <div className="replay-button" onClick={replayVideo}>
+                <i className="fas fa-play"></i>
+              </div>
+            </div>
+          )}
 
           {/* Recording indicator */}
           {isRecording && (
@@ -527,7 +602,7 @@ function App() {
               <div className="question-number">
                 Question {currentQuestion + 1} of {QUESTIONS.length}
               </div>
-              <div className="question-text">
+              <div className="question-text" key={currentQuestion}>
                 {QUESTIONS[currentQuestion]}
               </div>
             </div>

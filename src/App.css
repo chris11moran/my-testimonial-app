@@ -23,6 +23,38 @@
   box-sizing: border-box;
 }
 
+/* Animation Keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 body {
   font-family: 'Adineue Pro', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight: 500;
@@ -64,6 +96,7 @@ body {
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: #000000;
+  animation: scaleIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 /* Make description text grey with no shadow */
@@ -72,6 +105,16 @@ body {
   text-shadow: none;
   font-size: 1rem;
   font-weight: 400;
+}
+
+/* Description text for splash screens - smaller and more readable */
+.description-text {
+  color: #666666;
+  text-shadow: none;
+  font-size: 0.9rem;
+  font-weight: 400;
+  line-height: 1.5;
+  margin-bottom: 1rem;
 }
 
 /* Apply brand fonts to recording screen elements */
@@ -84,6 +127,7 @@ body {
   margin-bottom: 1rem;
   font-family: 'Adineue Pro', 'Inter', sans-serif;
   text-align: left;
+  animation: fadeIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .question-number {
@@ -268,6 +312,54 @@ video {
   z-index: 20;
 }
 
+/* Replay button overlay */
+.replay-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 15;
+  pointer-events: none; /* Allow clicks to pass through the overlay */
+}
+
+.replay-overlay:hover {
+  /* The button has its own hover effect, no need for one on the overlay */
+}
+
+.replay-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: rgba(255, 255, 255, 0.3);
+  border: 3px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  color: white;
+  font-size: 2rem;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  transform: scale(1);
+  pointer-events: auto; /* Make only the button clickable */
+  cursor: pointer;
+}
+
+.replay-overlay:hover .replay-button {
+  background: rgba(255, 255, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.7);
+  transform: scale(1.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.replay-button i {
+  margin-left: 4px; /* Slight offset to center the play icon visually */
+}
+
 .upload-status {
   display: inline-flex;
   align-items: center;
@@ -300,6 +392,7 @@ video {
   flex-direction: column;
   align-items: center;
   gap: 2rem;
+  z-index: 50;
 }
 
 /* Control buttons */
@@ -329,6 +422,8 @@ video {
   color: white;
   background: rgba(255, 255, 255, 0.1);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 101;
 }
 
 .control-button:hover:not(:disabled) {
@@ -336,6 +431,11 @@ video {
   background: rgba(255, 255, 255, 0.2);
   border-color: rgba(255, 255, 255, 0.5);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.control-button:active:not(:disabled) {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .control-button.danger {
@@ -362,6 +462,8 @@ video {
   gap: 2rem;
   width: 100%;
   max-width: 600px;
+  position: relative;
+  z-index: 100;
 }
 
 .nav-button {
@@ -575,26 +677,105 @@ input[type="password"]::placeholder {
 /* Logo at top of auth screen */
 .auth-logo {
   width: 120px;
-  margin-bottom: 2rem;
+  height: auto;
+  margin-bottom: 1.5rem;
 }
 
-/* Override header style on auth card */
+/* Instructions list styling */
+.instructions-list {
+  margin: 2rem 0;
+  text-align: left;
+}
+
+.instruction-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: rgba(202, 54, 68, 0.1);
+  border-radius: 12px;
+  border-left: 4px solid #CA3644;
+  transition: all 0.3s ease;
+  opacity: 0; /* Start hidden for animation */
+  animation: fadeInUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.instruction-item:nth-child(1) { animation-delay: 0.1s; }
+.instruction-item:nth-child(2) { animation-delay: 0.2s; }
+.instruction-item:nth-child(3) { animation-delay: 0.3s; }
+.instruction-item:nth-child(4) { animation-delay: 0.4s; }
+
+.instruction-item:hover {
+  background: rgba(202, 54, 68, 0.15);
+  transform: translateX(4px);
+}
+
+.instruction-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #CA3644 0%, #A72E3A 100%);
+  border-radius: 50%;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.instruction-icon i {
+  color: white;
+  font-size: 1rem;
+}
+
+.instruction-text {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  line-height: 1.4;
+}
+
+.begin-testimonial-btn {
+  margin-top: 2rem;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #CA3644 0%, #A72E3A 100%);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 300px;
+  margin: 2rem auto 0;
+}
+
+.begin-testimonial-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(202, 54, 68, 0.4);
+  background: linear-gradient(135deg, #D63E4F 0%, #B13240 100%);
+}
+
+.begin-testimonial-btn i {
+  font-size: 1.1rem;
+}
+
 .content-card h2 {
-  background: none;
-  -webkit-background-clip: unset;
-  -webkit-text-fill-color: #000000;
-  background-clip: unset;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
   color: #000000;
-  font-family: 'Chromatic Pro', sans-serif;
-  font-size: 2rem;
-  margin-bottom: 1rem;
+  font-family: 'Chromatic Pro', 'Inter', sans-serif;
 }
 
-/* Ensure password text is visible and placeholder uses brand red */
 .content-card input[type="password"] {
-  color: #000000;
+  color: #333;
 }
+
 .content-card input[type="password"]::placeholder {
-  color: #CA3644;
-  opacity: 1;
+  color: #999;
 }
