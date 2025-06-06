@@ -1,11 +1,11 @@
-const { Mux } = require('@mux/mux-node');
+import { Mux } from '@mux/mux-node';
 
 const mux = new Mux({
   tokenId: process.env.MUX_TOKEN_ID,
   tokenSecret: process.env.MUX_TOKEN_SECRET,
 });
 
-exports.handler = async (event, context) => {
+export const handler = async (event, context) => {
   // Enable CORS for all origins
   const headers = {
     'Access-Control-Allow-Origin': '*',
