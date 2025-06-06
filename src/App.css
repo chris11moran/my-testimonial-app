@@ -151,6 +151,11 @@ video {
   .recording-interface {
     height: 100vh;
     height: 100dvh; /* Dynamic viewport height for mobile browsers */
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow: hidden;
   }
 
   .video-container.mobile {
@@ -159,6 +164,9 @@ video {
     height: 100dvh;
     margin: 0;
     padding: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
   }
 
   .video-container.mobile video {
@@ -166,10 +174,14 @@ video {
   }
 
   .video-container.mobile canvas {
-    width: 100%;
-    height: 100%;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
     object-fit: cover; /* Fill the entire mobile screen */
     transform: scaleX(-1); /* Flip canvas horizontally for more natural view */
+    position: absolute;
+    top: 0;
+    left: 0;
   }
 }
 
