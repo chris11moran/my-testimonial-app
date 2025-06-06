@@ -147,11 +147,14 @@ video {
 
 /* Mobile-specific overrides */
 @media (max-width: 768px) {
-  /* On mobile, ensure the video is never cropped/zoomed. */
   .video-container.mobile video {
-    object-fit: contain; /* Shows the full sensor, letterboxing if necessary. */
+    display: none; /* Hide the original video element */
+  }
+
+  .video-container.mobile canvas {
     width: 100%;
     height: 100%;
+    object-fit: contain; /* Ensure the canvas fits within the container */
   }
 }
 

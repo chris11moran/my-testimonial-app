@@ -17,11 +17,14 @@ function App() {
   const [recordingUrls, setRecordingUrls] = useState(Array(QUESTIONS.length).fill(null));
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [cameraStream, setCameraStream] = useState(null);
+  const [processedStream, setProcessedStream] = useState(null);
   const [uploadStatus, setUploadStatus] = useState(Array(QUESTIONS.length).fill('idle'));
   const [uploading, setUploading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const animationFrameId = useRef(null);
 
   // Detect mobile device
   useEffect(() => {
@@ -53,8 +56,14 @@ function App() {
     
     // Cleanup function
     return () => {
+      if (animationFrameId.current) {
+        cancelAnimationFrame(animationFrameId.current);
+      }
       if (cameraStream) {
         cameraStream.getTracks().forEach(track => track.stop());
+      }
+      if (processedStream) {
+        processedStream.getTracks().forEach(track => track.stop());
       }
       // Clean up all object URLs
       recordingUrls.forEach(url => {
@@ -74,14 +83,13 @@ function App() {
 
   const setupCamera = async () => {
     try {
-      // Different camera constraints for mobile vs desktop
+      // Get a wide stream on mobile to ensure we have data to fill the vertical canvas
       const constraints = {
-        video: isMobile 
-          ? { 
-              width: { ideal: 720 }, 
-              height: { ideal: 1280 },
-              aspectRatio: { ideal: 9/16 },
-              facingMode: 'user' // Front camera for mobile
+        video: isMobile
+          ? {
+              width: { ideal: 1920 },
+              height: { ideal: 1080 },
+              facingMode: 'user'
             }
           : { 
               width: { ideal: 1920 }, 
@@ -93,9 +101,10 @@ function App() {
 
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       setCameraStream(stream);
+
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.muted = true; // Always muted for live preview
+        videoRef.current.muted = true; // Mute the hidden video element
       }
     } catch (error) {
       console.error('Error accessing camera:', error);
@@ -103,14 +112,61 @@ function App() {
     }
   };
 
+  const processVideoForMobile = () => {
+    if (!isMobile || !videoRef.current || !canvasRef.current) return;
+
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const context = canvas.getContext('2d');
+    
+    const portraitWidth = 720;
+    const portraitHeight = 1280;
+    canvas.width = portraitWidth;
+    canvas.height = portraitHeight;
+
+    const draw = () => {
+      const videoWidth = video.videoWidth;
+      const videoHeight = video.videoHeight;
+      const videoAspectRatio = videoWidth / videoHeight;
+      const canvasAspectRatio = canvas.width / canvas.height;
+
+      let sWidth, sHeight, sx, sy;
+
+      // This logic crops the wide video source to fit the tall canvas, simulating object-fit: cover
+      if (videoAspectRatio > canvasAspectRatio) {
+        sHeight = videoHeight;
+        sWidth = videoHeight * canvasAspectRatio;
+        sx = (videoWidth - sWidth) / 2;
+        sy = 0;
+      } else {
+        sWidth = videoWidth;
+        sHeight = videoWidth / canvasAspectRatio;
+        sx = 0;
+        sy = (videoHeight - sHeight) / 2;
+      }
+      
+      context.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
+      animationFrameId.current = requestAnimationFrame(draw);
+    };
+    draw();
+    
+    const stream = canvas.captureStream(30);
+    const audioTracks = cameraStream.getAudioTracks();
+    if(audioTracks.length > 0) {
+      stream.addTrack(audioTracks[0]);
+    }
+    setProcessedStream(stream);
+  }
+
   const startRecording = async () => {
-    if (!cameraStream) {
+    const streamToRecord = (isMobile && processedStream) ? processedStream : cameraStream;
+    if (!streamToRecord) {
       alert('Camera not ready. Please try again.');
       return;
     }
 
     try {
-      const recorder = new MediaRecorder(cameraStream, { 
+      const recorder = new MediaRecorder(streamToRecord, { 
         mimeType: 'video/webm;codecs=vp9' 
       });
       const chunks = [];
@@ -324,20 +380,30 @@ function App() {
   useEffect(() => {
     if (videoRef.current && cameraStream) {
       if (recordings[currentQuestion]) {
-        // Show recorded video
+        // When showing a previous recording, hide the canvas and show the video element
+        if (isMobile && canvasRef.current) {
+          canvasRef.current.style.display = 'none';
+        }
+        videoRef.current.style.display = 'block';
         videoRef.current.srcObject = null;
         videoRef.current.src = recordingUrls[currentQuestion];
         videoRef.current.muted = false;
         videoRef.current.controls = true;
       } else {
-        // Show live camera feed
+        // When showing the live feed, show the canvas (on mobile) or video (on desktop)
+        if (isMobile && canvasRef.current) {
+          canvasRef.current.style.display = 'block';
+          videoRef.current.style.display = 'none';
+        } else if (videoRef.current) {
+           videoRef.current.style.display = 'block';
+        }
         videoRef.current.src = '';
         videoRef.current.srcObject = cameraStream;
         videoRef.current.muted = true;
         videoRef.current.controls = false;
       }
     }
-  }, [currentQuestion, recordings, cameraStream, recordingUrls]);
+  }, [currentQuestion, recordings, cameraStream, recordingUrls, isMobile]);
 
   const getUploadStatusIndicator = (questionIndex) => {
     switch (uploadStatus[questionIndex]) {
@@ -420,12 +486,10 @@ function App() {
             ref={videoRef} 
             autoPlay 
             playsInline
-            onLoadedMetadata={() => {
-              if (videoRef.current && currentRecording) {
-                videoRef.current.currentTime = 0;
-              }
-            }}
+            onLoadedData={processVideoForMobile}
+            style={{ display: isMobile ? 'none' : 'block' }}
           />
+          {isMobile && <canvas ref={canvasRef} />}
 
           {/* Recording indicator */}
           {isRecording && (
