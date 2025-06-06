@@ -435,7 +435,7 @@ function App() {
             </div>
           )}
           
-          {!currentRecording && !isRecording && (
+          {!currentRecording && !isRecording && !isMobile && (
             <div className="recording-indicator live-preview">
               <i className="fas fa-eye"></i>
               LIVE PREVIEW

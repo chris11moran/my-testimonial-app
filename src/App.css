@@ -146,6 +146,8 @@ body {
 /* Ensure the video is fully visible on mobile without cropping */
 .video-container.mobile video {
   object-fit: contain;
+  width: 100%;
+  height: 100%;
 }
 
 video {
@@ -439,8 +441,36 @@ input[type="password"]::placeholder {
 
 /* Mobile styles */
 @media (max-width: 768px) {
+  .recording-interface {
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile browsers */
+  }
+
+  /* Override video container ONLY on mobile */
+  .video-container.mobile {
+    aspect-ratio: 9/16;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height */
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Mobile video should fill container and maintain aspect ratio */
+  .video-container.mobile video {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+  }
+
   .overlay-content {
-    padding: 1.5rem;
+    padding: 2rem 1.5rem;
+    padding-top: max(2rem, env(safe-area-inset-top) + 1rem);
+    padding-bottom: max(2rem, env(safe-area-inset-bottom) + 1rem);
+    padding-left: max(1.5rem, env(safe-area-inset-left) + 1rem);
+    padding-right: max(1.5rem, env(safe-area-inset-right) + 1rem);
   }
   
   .question-text {
@@ -472,11 +502,16 @@ input[type="password"]::placeholder {
   
   .recording-indicator,
   .upload-status-overlay {
-    position: relative;
-    top: auto;
-    left: auto;
+    position: absolute;
+    top: max(1rem, env(safe-area-inset-top) + 0.5rem);
+    left: max(1rem, env(safe-area-inset-left) + 0.5rem);
     right: auto;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
+  }
+
+  .upload-status-overlay {
+    left: auto;
+    right: max(1rem, env(safe-area-inset-right) + 0.5rem);
   }
   
   .progress-bar {
