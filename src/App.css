@@ -76,13 +76,14 @@ body {
 
 /* Apply brand fonts to recording screen elements */
 .question-text {
-  font-size: 1.5rem;
+  font-size: 2rem !important;
   font-weight: 600;
   color: white;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
   line-height: 1.4;
   margin-bottom: 1rem;
   font-family: 'Adineue Pro', 'Inter', sans-serif;
+  text-align: left;
 }
 
 .question-number {
@@ -90,7 +91,6 @@ body {
   color: rgba(255, 255, 255, 0.8);
   margin-bottom: 1rem;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   font-family: 'Chromatic Pro', sans-serif;
 }
@@ -209,6 +209,7 @@ video {
   background: rgba(255, 255, 255, 0.3);
   border-radius: 2px;
   margin-bottom: 2rem;
+  margin-top: 4rem;
   overflow: hidden;
 }
 
@@ -309,7 +310,6 @@ video {
   border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s ease;
-  text-transform: uppercase;
   letter-spacing: 0.05em;
   min-height: 54px;
   backdrop-filter: blur(10px);
