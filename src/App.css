@@ -133,28 +133,26 @@ body {
   width: 100%;
   height: 100%;
   background: #000;
-}
-
-.video-container.mobile {
-  aspect-ratio: 9/16;
-  width: 100%;
-  height: auto;
-  max-height: 100vh;
-  margin: auto;
-}
-
-/* Ensure the video is fully visible on mobile without cropping */
-.video-container.mobile video {
-  object-fit: contain;
-  width: 100%;
-  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: cover; /* Default for desktop: fill the screen */
   background: #000;
+}
+
+/* Mobile-specific overrides */
+@media (max-width: 768px) {
+  /* On mobile, ensure the video is never cropped/zoomed. */
+  .video-container.mobile video {
+    object-fit: contain; /* Shows the full sensor, letterboxing if necessary. */
+    width: 100%;
+    height: 100%;
+  }
 }
 
 /* Overlay content */

@@ -21,10 +21,7 @@ function App() {
   const [uploading, setUploading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [processedStream, setProcessedStream] = useState(null);
   const videoRef = useRef(null);
-  const canvasRef = useRef(null);
-  const requestRef = useRef(null);
 
   // Detect mobile device
   useEffect(() => {
@@ -59,12 +56,6 @@ function App() {
       if (cameraStream) {
         cameraStream.getTracks().forEach(track => track.stop());
       }
-      if (processedStream) {
-        processedStream.getTracks().forEach(track => track.stop());
-      }
-      if (requestRef.current) {
-        cancelAnimationFrame(requestRef.current);
-      }
       // Clean up all object URLs
       recordingUrls.forEach(url => {
         if (url) URL.revokeObjectURL(url);
@@ -80,47 +71,6 @@ function App() {
       });
     };
   }, [recordingUrls]);
-
-  const processVideoForMobile = () => {
-    if (!isMobile || !videoRef.current || !canvasRef.current || !cameraStream) return;
-
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    const context = canvas.getContext('2d');
-
-    canvas.width = 720;
-    canvas.height = 1280;
-
-    const drawToCanvas = () => {
-        const videoAspectRatio = video.videoWidth / video.videoHeight;
-        const canvasAspectRatio = canvas.width / canvas.height;
-        let drawWidth = canvas.width;
-        let drawHeight = canvas.height;
-        let x = 0;
-        let y = 0;
-
-        if (videoAspectRatio > canvasAspectRatio) {
-            drawHeight = canvas.width / videoAspectRatio;
-            y = (canvas.height - drawHeight) / 2;
-        } else {
-            drawWidth = canvas.height * videoAspectRatio;
-            x = (canvas.width - drawWidth) / 2;
-        }
-
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.drawImage(video, x, y, drawWidth, drawHeight);
-        requestRef.current = requestAnimationFrame(drawToCanvas);
-    };
-
-    drawToCanvas();
-
-    const canvasStream = canvas.captureStream(30);
-    const audioTracks = cameraStream.getAudioTracks();
-    if (audioTracks.length > 0) {
-        canvasStream.addTrack(audioTracks[0]);
-    }
-    setProcessedStream(canvasStream);
-  };
 
   const setupCamera = async () => {
     try {
@@ -154,14 +104,13 @@ function App() {
   };
 
   const startRecording = async () => {
-    const streamToRecord = isMobile && processedStream ? processedStream : cameraStream;
-    if (!streamToRecord) {
-      alert('Camera not ready. Please wait a moment and try again.');
+    if (!cameraStream) {
+      alert('Camera not ready. Please try again.');
       return;
     }
 
     try {
-      const recorder = new MediaRecorder(streamToRecord, { 
+      const recorder = new MediaRecorder(cameraStream, { 
         mimeType: 'video/webm;codecs=vp9' 
       });
       const chunks = [];
@@ -472,15 +421,11 @@ function App() {
             autoPlay 
             playsInline
             onLoadedMetadata={() => {
-              if (isMobile) {
-                processVideoForMobile();
-              }
               if (videoRef.current && currentRecording) {
                 videoRef.current.currentTime = 0;
               }
             }}
           />
-          <canvas ref={canvasRef} style={{ display: 'none' }} />
 
           {/* Recording indicator */}
           {isRecording && (
