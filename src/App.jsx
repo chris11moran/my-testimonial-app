@@ -25,6 +25,7 @@ function App() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [supportedMimeType, setSupportedMimeType] = useState('');
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const animationFrameId = useRef(null);
@@ -40,6 +41,34 @@ function App() {
     window.addEventListener('resize', checkIfMobile);
     
     return () => window.removeEventListener('resize', checkIfMobile);
+  }, []);
+
+  // Determine supported mime type for MediaRecorder for cross-browser compatibility
+  useEffect(() => {
+    const getSupportedMimeType = () => {
+      // List of preferred mime types, with webm for Chrome/Firefox and mp4 for Safari
+      const mimeTypes = [
+        'video/webm;codecs=vp9,opus',
+        'video/webm;codecs=vp9',
+        'video/mp4;codecs=h264,aac',
+        'video/mp4',
+        'video/webm;codecs=vp8,opus',
+        'video/webm;codecs=vp8',
+        'video/webm',
+      ];
+      for (const mimeType of mimeTypes) {
+        if (MediaRecorder.isTypeSupported(mimeType)) {
+          console.log(`Using supported mimeType: ${mimeType}`);
+          return mimeType;
+        }
+      }
+      console.warn('No preferred mimeType supported, using browser default.');
+      return ''; // Let browser decide if none of our preferred types are supported
+    };
+
+    if (typeof MediaRecorder !== 'undefined') {
+      setSupportedMimeType(getSupportedMimeType());
+    }
   }, []);
 
   const handlePasswordSubmit = (e) => {
@@ -159,10 +188,17 @@ function App() {
       return;
     }
 
+    if (typeof MediaRecorder === 'undefined') {
+      alert('Your browser does not support the MediaRecorder API, which is needed to record video. Please try a different browser like Chrome or Firefox.');
+      return;
+    }
+
     try {
-      const recorder = new MediaRecorder(streamToRecord, { 
-        mimeType: 'video/webm;codecs=vp9' 
-      });
+      const options = {};
+      if (supportedMimeType) {
+        options.mimeType = supportedMimeType;
+      }
+      const recorder = new MediaRecorder(streamToRecord, options);
       const chunks = [];
 
       recorder.ondataavailable = (event) => {
@@ -172,7 +208,8 @@ function App() {
       };
 
       recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'video/webm' });
+        // Use the mimeType from the recorder itself to ensure it's correct
+        const blob = new Blob(chunks, { type: recorder.mimeType });
         const url = URL.createObjectURL(blob);
         
         // Clean up previous recording URL for this question
@@ -226,6 +263,10 @@ function App() {
       newUploadStatus[questionIndex] = 'uploading';
       setUploadStatus(newUploadStatus);
 
+      // Determine file extension and content type from the blob
+      const mimeType = videoBlob.type;
+      const extension = mimeType.includes('webm') ? 'webm' : 'mp4';
+
       // Get the direct upload URL from our Netlify Function
       const uploadUrlResponse = await fetch('/api/create-upload-url', {
         method: 'POST',
@@ -233,7 +274,7 @@ function App() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          filename: `testimonial-question-${questionIndex + 1}.webm`
+          filename: `testimonial-question-${questionIndex + 1}.${extension}`
         })
       });
 
@@ -248,7 +289,7 @@ function App() {
         method: 'PUT',
         body: videoBlob,
         headers: {
-          'Content-Type': 'video/webm'
+          'Content-Type': mimeType
         }
       });
 
