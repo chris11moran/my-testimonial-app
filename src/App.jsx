@@ -2,11 +2,11 @@ import { useState, useRef, useEffect } from 'react'
 import './App.css'
 
 const QUESTIONS = [
-  "What makes you uniquely qualified to help clients achieve their goals?",
-  "Describe a time when you helped a client overcome a significant challenge.",
-  "What's your approach to building long-term client relationships?",
-  "How do you stay current with industry trends and best practices?",
-  "What would your ideal client say about working with you?"
+  "What challenge or need led you to work with We Build Bridges?",
+  "What made you choose us over other options or agencies?",
+  "What was the experience like working with us?",
+  "What kind of results did you see from the project or campaign?",
+  "What would you say to someone considering working with us?"
 ];
 
 function App() {
