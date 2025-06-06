@@ -85,18 +85,27 @@ body {
 
 /* Auth and success states - keep original card design */
 .content-card {
-  background: #FAFAFA;
-  border-radius: 24px;
-  padding: 2rem;
-  width: 100%;
-  max-width: 400px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  background-color: #ffffff;
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   text-align: center;
-  position: relative;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #000000;
-  animation: scaleIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  max-width: 500px;
+  width: 90%;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Make splash screen scrollable on small heights */
+.splash-screen .content-card {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.splash-screen .begin-testimonial-btn {
+  margin-top: auto; /* Pushes button to the bottom */
+  padding-top: 1rem;
 }
 
 /* Make description text grey with no shadow */
@@ -475,12 +484,10 @@ h2 {
   font-family: 'Chromatic Pro', 'Inter', sans-serif;
   font-weight: 900;
   text-transform: uppercase;
-  font-size: 3rem;
+  font-size: 3rem !important;
   margin-bottom: 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #1a1919 !important;
+  line-height: 1;
 }
 
 /* Form styles for auth */
@@ -676,9 +683,8 @@ input[type="password"]::placeholder {
 
 /* Logo at top of auth screen */
 .auth-logo {
-  width: 120px;
-  height: auto;
-  margin-bottom: 1.5rem;
+  width: 80px;
+  margin: 0 auto 1.5rem;
 }
 
 /* Instructions list styling */

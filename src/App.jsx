@@ -438,7 +438,7 @@ function App() {
   // Splash screen with instructions
   if (isAuthenticated && !hasStartedTestimonial) {
     return (
-      <div className="container">
+      <div className="container splash-screen">
         <div className="content-card">
           <img src="/Red Logo.svg" alt="Logo" className="auth-logo" />
           <h2>Ready to Record Your Testimonial?</h2>
