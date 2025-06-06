@@ -80,6 +80,7 @@ function App() {
           ? { 
               width: { ideal: 720 }, 
               height: { ideal: 1280 },
+              aspectRatio: { ideal: 9/16 },
               facingMode: 'user' // Front camera for mobile
             }
           : { 
@@ -370,6 +371,7 @@ function App() {
     return (
       <div className="container">
         <div className="content-card">
+          <img src="/Red Logo.svg" alt="Logo" className="auth-logo" />
           <h2>Video Testimonials</h2>
           <p className="question-text">Please enter the password to access the testimonial recording.</p>
           <form onSubmit={handlePasswordSubmit}>

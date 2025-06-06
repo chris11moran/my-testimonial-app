@@ -4,14 +4,16 @@
 /* Custom font declarations - fallback to similar fonts if custom ones aren't available */
 @font-face {
   font-family: 'Adineue Pro';
-  src: local('Inter'), local('Arial');
-  font-weight: 500;
+  src: url('/fonts/adineuePRO-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
 }
 
 @font-face {
   font-family: 'Chromatic Pro';
-  src: local('Inter'), local('Arial Black');
-  font-weight: 900;
+  src: url('/fonts/ChromaticPro-CompactBold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
 }
 
 /* Base styles */
@@ -35,12 +37,13 @@ body {
 /* Container - Full screen for recording */
 .container {
   min-height: 100vh;
+  width: 100vw;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #CA3644 0%, #A72E3A 100%);
 }
 
 .container.recording-mode {
@@ -50,17 +53,69 @@ body {
 
 /* Auth and success states - keep original card design */
 .content-card {
-  background: white;
+  background: #FAFAFA;
   border-radius: 24px;
   padding: 2rem;
   width: 100%;
-  max-width: 500px;
+  max-width: 400px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   text-align: center;
   position: relative;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #1e293b;
+  color: #000000;
+}
+
+/* Make description text grey with no shadow */
+.content-card .question-text {
+  color: #666666;
+  text-shadow: none;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+/* Apply brand fonts to recording screen elements */
+.question-text {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  line-height: 1.4;
+  margin-bottom: 1rem;
+  font-family: 'Adineue Pro', 'Inter', sans-serif;
+}
+
+.question-number {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  font-family: 'Chromatic Pro', sans-serif;
+}
+
+/* Update control buttons to use brand colors */
+.control-button.primary {
+  background: linear-gradient(135deg, #CA3644 0%, #A72E3A 100%);
+  border-color: transparent;
+}
+
+.control-button.primary:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 12px 40px rgba(202, 54, 68, 0.5);
+}
+
+/* Update progress bar to use brand colors */
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #CA3644 0%, #A72E3A 100%);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.question-overlay {
+  max-width: 800px;
 }
 
 /* Recording interface - full screen */
@@ -82,9 +137,15 @@ body {
 
 .video-container.mobile {
   aspect-ratio: 9/16;
+  width: 100%;
   height: auto;
   max-height: 100vh;
-  margin: 0 auto;
+  margin: auto;
+}
+
+/* Ensure the video is fully visible on mobile without cropping */
+.video-container.mobile video {
+  object-fit: contain;
 }
 
 video {
@@ -133,36 +194,6 @@ video {
   overflow: hidden;
 }
 
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-  border-radius: 2px;
-  transition: width 0.3s ease;
-}
-
-.question-overlay {
-  max-width: 800px;
-}
-
-.question-number {
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.question-text {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: white;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
-  line-height: 1.4;
-  margin-bottom: 1rem;
-}
-
-/* Recording indicators */
 .recording-indicator {
   position: absolute;
   top: 2rem;
@@ -277,16 +308,6 @@ video {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
 }
 
-.control-button.primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-color: transparent;
-}
-
-.control-button.primary:hover:not(:disabled) {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.5);
-}
-
 .control-button.danger {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   border-color: transparent;
@@ -364,8 +385,8 @@ input[type="password"]::placeholder {
 
 /* Auth/success buttons */
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: #CA3644;
+  color: #FAFAFA;
   border: none;
   padding: 1rem 2rem;
   border-radius: 12px;
@@ -379,8 +400,8 @@ input[type="password"]::placeholder {
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+  background: #A72E3A;
+  box-shadow: 0 8px 25px rgba(202, 54, 68, 0.6);
 }
 
 /* Success state */
@@ -390,7 +411,7 @@ input[type="password"]::placeholder {
 
 .success-icon {
   font-size: 4rem;
-  color: #16a34a;
+  color: #CA3644;
   margin-bottom: 1rem;
 }
 
@@ -489,4 +510,31 @@ input[type="password"]::placeholder {
     padding: 1.25rem 2.5rem;
     font-size: 1.125rem;
   }
+}
+
+/* Logo at top of auth screen */
+.auth-logo {
+  width: 120px;
+  margin-bottom: 2rem;
+}
+
+/* Override header style on auth card */
+.content-card h2 {
+  background: none;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: #000000;
+  background-clip: unset;
+  color: #000000;
+  font-family: 'Chromatic Pro', sans-serif;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+/* Ensure password text is visible and placeholder uses brand red */
+.content-card input[type="password"] {
+  color: #000000;
+}
+.content-card input[type="password"]::placeholder {
+  color: #CA3644;
+  opacity: 1;
 }
