@@ -143,10 +143,24 @@ video {
   height: 100%;
   object-fit: cover; /* Default for desktop: fill the screen */
   background: #000;
+  transform: scaleX(-1); /* Flip camera horizontally for more natural view */
 }
 
 /* Mobile-specific overrides */
 @media (max-width: 768px) {
+  .recording-interface {
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile browsers */
+  }
+
+  .video-container.mobile {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    margin: 0;
+    padding: 0;
+  }
+
   .video-container.mobile video {
     display: none; /* Hide the original video element */
   }
@@ -154,7 +168,8 @@ video {
   .video-container.mobile canvas {
     width: 100%;
     height: 100%;
-    object-fit: contain; /* Ensure the canvas fits within the container */
+    object-fit: cover; /* Fill the entire mobile screen */
+    transform: scaleX(-1); /* Flip canvas horizontally for more natural view */
   }
 }
 
