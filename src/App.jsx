@@ -75,15 +75,6 @@ function App() {
     };
   }, [isAuthenticated]);
 
-  // Clean up object URLs when recordings change
-  useEffect(() => {
-    return () => {
-      recordingUrls.forEach(url => {
-        if (url) URL.revokeObjectURL(url);
-      });
-    };
-  }, [recordingUrls]);
-
   const setupCamera = async () => {
     try {
       // Get a wide stream on mobile to ensure we have data to fill the vertical canvas
@@ -299,36 +290,12 @@ function App() {
 
     if (currentQuestion < QUESTIONS.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
-      // Reset video element for next question
-      resetVideoForNextQuestion();
     }
   };
 
   const handlePrevious = () => {
     if (currentQuestion > 0) {
       setCurrentQuestion(currentQuestion - 1);
-      // Reset video element for previous question
-      resetVideoForNextQuestion();
-    }
-  };
-
-  const resetVideoForNextQuestion = () => {
-    if (videoRef.current) {
-      const targetQuestion = currentQuestion + (currentQuestion < QUESTIONS.length - 1 ? 1 : -1);
-      
-      if (recordings[targetQuestion]) {
-        // Show recorded video for this question
-        videoRef.current.srcObject = null;
-        videoRef.current.src = recordingUrls[targetQuestion];
-        videoRef.current.muted = false;
-        videoRef.current.controls = true;
-      } else {
-        // Show live camera feed
-        videoRef.current.src = '';
-        videoRef.current.srcObject = cameraStream;
-        videoRef.current.muted = true;
-        setIsVideoPlaying(false);
-      }
     }
   };
 
@@ -414,7 +381,7 @@ function App() {
         setIsVideoPlaying(false);
       }
     }
-  }, [currentQuestion, recordings, cameraStream, recordingUrls, isMobile]);
+  }, [currentQuestion, recordings, cameraStream, recordingUrls, isMobile, hasStartedTestimonial]);
 
   const getUploadStatusIndicator = (questionIndex) => {
     switch (uploadStatus[questionIndex]) {
@@ -549,7 +516,7 @@ function App() {
             autoPlay 
             playsInline
             controls={currentRecording && isVideoPlaying}
-            onLoadedData={processVideoForMobile}
+            onPlaying={processVideoForMobile}
             onPlay={() => setIsVideoPlaying(true)}
             onPause={() => setIsVideoPlaying(false)}
             onEnded={() => setIsVideoPlaying(false)}
