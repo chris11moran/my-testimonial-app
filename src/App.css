@@ -63,6 +63,9 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body.body-no-scroll {
   overflow: hidden;
 }
 
@@ -78,9 +81,17 @@ body {
   background: linear-gradient(135deg, #CA3644 0%, #A72E3A 100%);
 }
 
+.container.splash-screen {
+  justify-content: flex-start;
+  padding-top: 5vh;
+  padding-bottom: 5vh;
+}
+
 .container.recording-mode {
   padding: 0;
   background: #000;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Auth and success states - keep original card design */
@@ -97,14 +108,13 @@ body {
   flex-direction: column;
 }
 
-/* Make splash screen scrollable on small heights */
+/* Let the page scroll on the splash screen instead of the card */
 .splash-screen .content-card {
-  max-height: 90vh;
-  overflow-y: auto;
+  /* No more fixed height or scrolling */
 }
 
 .splash-screen .begin-testimonial-btn {
-  margin-top: auto; /* Pushes button to the bottom */
+  margin-top: 2rem;
   padding-top: 1rem;
 }
 

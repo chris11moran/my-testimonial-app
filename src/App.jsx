@@ -30,6 +30,20 @@ function App() {
   const canvasRef = useRef(null);
   const animationFrameId = useRef(null);
 
+  // Body scroll management
+  useEffect(() => {
+    const isRecordingActive = isAuthenticated && hasStartedTestimonial && !isSubmitted;
+    if (isRecordingActive) {
+      document.body.classList.add('body-no-scroll');
+    } else {
+      document.body.classList.remove('body-no-scroll');
+    }
+    // Cleanup on unmount
+    return () => {
+      document.body.classList.remove('body-no-scroll');
+    };
+  }, [isAuthenticated, hasStartedTestimonial, isSubmitted]);
+
   // Detect mobile device
   useEffect(() => {
     const checkIfMobile = () => {
