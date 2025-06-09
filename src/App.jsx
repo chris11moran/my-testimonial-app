@@ -4,7 +4,7 @@ import './App.css'
 const QUESTIONS = [
   "Introduce yourself, your name and your company title",
   "What challenge or need led you to work with We Build Bridges?",
-  "What was the experience like working with us?",
+  "What was the experience like working with Chris and his team?",
   "Is there anything that stood out to you about working with us versus other options?",
   "What kind of work did you get done, and what did you think of the final product?",
   "What would you say to someone considering working with us?"
