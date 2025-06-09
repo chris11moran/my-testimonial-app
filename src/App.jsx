@@ -26,6 +26,8 @@ function App() {
   const [isMobile, setIsMobile] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [supportedMimeType, setSupportedMimeType] = useState('');
+  const [showEyeContactPopup, setShowEyeContactPopup] = useState(false);
+  const [hasShownEyeContactPopup, setHasShownEyeContactPopup] = useState(false);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const animationFrameId = useRef(null);
@@ -122,18 +124,18 @@ function App() {
     try {
       // Get a wide stream on mobile to ensure we have data to fill the vertical canvas
       const constraints = {
-        video: isMobile
-          ? {
-              width: { ideal: 1920 },
-              height: { ideal: 1080 },
-              facingMode: 'user'
-            }
-          : { 
-              width: { ideal: 1920 }, 
-              height: { ideal: 1080 },
-              facingMode: 'user'
-            },
-        audio: true
+        video: {
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+          frameRate: { ideal: 30 },
+          facingMode: 'user'
+        },
+        audio: {
+          sampleRate: 48000,
+          channelCount: 2,
+          echoCancellation: true,
+          noiseSuppression: true,
+        }
       };
 
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -156,8 +158,8 @@ function App() {
     const canvas = canvasRef.current;
     const context = canvas.getContext('2d');
     
-    const portraitWidth = 720;
-    const portraitHeight = 1280;
+    const portraitWidth = 1080;
+    const portraitHeight = 1920;
     canvas.width = portraitWidth;
     canvas.height = portraitHeight;
 
@@ -208,7 +210,10 @@ function App() {
     }
 
     try {
-      const options = {};
+      const options = {
+        videoBitsPerSecond: 8000000, // 8 Mbps for high quality
+        audioBitsPerSecond: 128000,  // 128 kbps for audio
+      };
       if (supportedMimeType) {
         options.mimeType = supportedMimeType;
       }
@@ -438,6 +443,30 @@ function App() {
     }
   }, [currentQuestion, recordings, cameraStream, recordingUrls, isMobile, hasStartedTestimonial]);
 
+  // Show eye contact popup only on first question - only once ever
+  useEffect(() => {
+    if (hasStartedTestimonial && currentQuestion === 0 && !hasShownEyeContactPopup) {
+      // Show popup after a brief delay to let the recording interface load
+      const timer = setTimeout(() => {
+        setShowEyeContactPopup(true);
+        setHasShownEyeContactPopup(true); // Mark as shown so it never shows again
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [hasStartedTestimonial, currentQuestion, hasShownEyeContactPopup]);
+
+  // Auto-hide popup after 5 seconds
+  useEffect(() => {
+    if (showEyeContactPopup) {
+      const timer = setTimeout(() => {
+        setShowEyeContactPopup(false);
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [showEyeContactPopup]);
+
   const getUploadStatusIndicator = (questionIndex) => {
     switch (uploadStatus[questionIndex]) {
       case 'uploading':
@@ -600,6 +629,23 @@ function App() {
             <div className="recording-indicator live-preview">
               <i className="fas fa-eye"></i>
               LIVE PREVIEW
+            </div>
+          )}
+
+          {/* Eye contact popup - only shows on first question */}
+          {showEyeContactPopup && currentQuestion === 0 && (
+            <div className="eye-contact-popup" onClick={() => setShowEyeContactPopup(false)}>
+              <div className="popup-content">
+                <div className="popup-icon">
+                  <i className="fas fa-eye"></i>
+                </div>
+                <div className="popup-text">
+                  If you are comfortable, try to hold eye contact with the camera
+                </div>
+                <div className="popup-dismiss">
+                  <i className="fas fa-times"></i>
+                </div>
+              </div>
             </div>
           )}
 
