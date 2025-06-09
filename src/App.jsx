@@ -90,7 +90,7 @@ function App() {
   const handlePasswordSubmit = (e) => {
     e.preventDefault();
     const password = e.target.password.value;
-    if (password === 'password123') {
+    if (password === 'bridges') {
       setIsAuthenticated(true);
     } else {
       alert('Incorrect password');
@@ -540,7 +540,14 @@ function App() {
               <div className="instruction-icon">
                 <i className="fas fa-headphones-alt"></i>
               </div>
-              <div className="instruction-text">No AirPods / iPhone audio is better</div>
+              <div className="instruction-text">No AirPods, iPhone audio is better</div>
+            </div>
+            
+            <div className="instruction-item">
+              <div className="instruction-icon">
+                <i className="fas fa-mobile-alt"></i>
+              </div>
+              <div className="instruction-text">Prop phone up on a stable surface</div>
             </div>
             
             <div className="instruction-item">
@@ -683,7 +690,7 @@ function App() {
               {!currentRecording ? (
                 <button
                   onClick={isRecording ? stopRecording : startRecording}
-                  disabled={uploading}
+                  disabled={uploading || (showEyeContactPopup && currentQuestion === 0)}
                   className={`control-button ${isRecording ? 'danger' : 'primary'}`}
                 >
                   {isRecording ? (

@@ -352,7 +352,6 @@ video {
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  max-width: 450px;
   position: relative;
   transition: all 0.3s ease;
 }
@@ -439,6 +438,12 @@ video {
     width: 40px;
     height: 40px;
     font-size: 1.25rem;
+  }
+}
+
+@media (min-width: 769px) {
+  .popup-content {
+    max-width: 450px;
   }
 }
 
