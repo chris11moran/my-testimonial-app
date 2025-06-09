@@ -40,7 +40,7 @@ export const handler = async (event, context) => {
     const upload = await mux.video.uploads.create({
       new_asset_settings: {
         playback_policy: ['public'],
-        encoding_tier: 'plus',
+        video_quality: 'plus',
         mp4_support: 'standard',
         normalize_audio: true
       },
